@@ -1,4 +1,4 @@
-#include <iostream>
+`#include <iostream>
 
 using namespace std;
 void DesplayMenu();
@@ -205,9 +205,17 @@ public:
 
 	void deleteX()
 	{
-
+		Node* temp = head;
+		while (head != tail)
+		{
+		temp = head->get_next();
+		delete head;
+		head = temp;
+		}
+		delete head;
+		head = nullptr;
+		tail = head;
 	}
-
 	void reverse()
 	{
 		if (isEmpty())
