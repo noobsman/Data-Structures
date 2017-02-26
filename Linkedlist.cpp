@@ -13,7 +13,6 @@ public:
 	{
 		next = nullptr;
 		prev = nullptr;
-		this->value = value;
 	}
 	Node* get_prev()
 	{
@@ -69,7 +68,7 @@ public:
 		{
 			if (ListType != Singly_Circ || ListType != Doubly_Circ)
 			{
-				if (Doubly)
+				if (ListType == Doubly)
 				{
 					n->set_next(nullptr);
 					tail->set_prev(n);
@@ -85,7 +84,7 @@ public:
 			}
 			else
 			{
-				if (Doubly_Circ)
+				if (ListType == Doubly_Circ)
 				{
 					n->set_next(head);
 					tail->set_next(n);
