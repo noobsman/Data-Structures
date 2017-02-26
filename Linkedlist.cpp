@@ -220,14 +220,11 @@ public:
 	{
 		if (isEmpty())
 		{
-
+			return;
 		}
-		else
-		{
 			Node* temp = head;
 			head = tail;
 			tail = temp;
-		}
 	}
 
 	void rotate(int rotations)
