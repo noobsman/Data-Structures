@@ -124,7 +124,7 @@ public:
 				{
 					if (ListType != Singly_Circ || ListType != Doubly_Circ)
 					{
-						if (Doubly)
+						if (ListType == Doubly)
 						{
 
 						}
@@ -135,7 +135,7 @@ public:
 					}
 					else
 					{
-						if (Doubly_Circ)
+						if (ListType == Doubly_Circ)
 						{
 
 						}
