@@ -66,7 +66,7 @@ public:
 		}
 		else
 		{
-			if (ListType != Singly_Circ || ListType != Doubly_Circ)
+			if (!is_circular())
 			{
 				if (ListType == Doubly)
 				{
@@ -122,7 +122,7 @@ public:
 				}
 				else
 				{
-					if (ListType != Singly_Circ || ListType != Doubly_Circ)
+					if (!is_circular())
 					{
 						if (ListType == Doubly)
 						{
@@ -182,7 +182,7 @@ public:
 		}
 		else
 		{
-			if (ListType != Singly_Circ || ListType != Doubly_Circ)
+			if (!is_circular())
 			{
 				Node * temp = head;
 				while (temp != nullptr)
@@ -316,6 +316,13 @@ private:
 	Node * tail;
 	int SizeCount;
 	int ListType;
+	bool is_circular() {
+		return ListType == Doubly_Circ || ListType == Singly_Circ;
+	}
+
+	bool is_singly() {
+		return ListType == Singly || ListType == Singly_Circ;
+	}
 };
 
 int main()
