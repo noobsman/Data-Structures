@@ -3,97 +3,102 @@
 using namespace std;
 void DesplayMenu();
 void DesplayType();
+void create_List();
+enum listType { Doubly = 1, Singly = 2, Singly_Circular = 3, Doubly_Circular = 4 };
 
-enum listType { Doubly = 1, Singly = 2, Circular = 3, Doubly_Circular = 4 };
-
-//Node
-//template <typename T>
 class Node
 {
 public:
-	Node(Node * previous, Node * next, int value) 
+	Node(int value) : value(value)
 	{
-		this->next = next;
-		this->previous = previous;
+		next = nullptr;
+		prev = nullptr;
 		this->value = value;
 	}
+	Node* get_prev()
+	{
+		return prev;
+	}
+	Node* get_prev()
+	{
+		return next;
+	}
 private:
-	Node * previous;
-	Node * next;
+	Node * prev, * next;
 	int value;
 };
 
-//LinkedList
-//template <typename T>
 class LinkedList
 {
 public:
 	LinkedList()
 	{
-		head = NULL;
-		tail = NULL;
+		head = nullptr;
+		tail = nullptr;
 		SizeCount = 0;
 		ListType = -1;
 	}
 	//checks if list is empty
-	bool isEmpty()
+		bool isEmpty()
 	{
-		return head == NULL;
+		return head == nullptr;
 	}
-
-	//Adds node to front of list
-	//template <typename T>
-	void push(Node* n)
+	void append(Node * n) //Adds node to end of the list
 	{
 		if (isEmpty())
 		{
-			head = new Node(NULL, NULL, value);
-			tail = head;
+			head = n;
+			tail = n;
 		}
-		else {
-			if (ListType != Circular || ListType != Doubly_Circular)
+
+		else
+		{
+			if (ListType != Singly_Circular || ListType != Doubly_Circular)
 			{
-				head->previous = new Node(NULL, head, value);
-				head = head->previous;
+				if (Doubly)
+				{
+					n->next = nullptr;
+					tail->next = n;
+					n->prev = tail;
+					tail = n;
+				}
+				else //Singly
+				{
+					n->next = nullptr;
+					tail->next = n;
+					tail = n;
+				}
 			}
 			else
 			{
-				head->previous = new Node(tail, head, value);
-				head = head->previous;
+				if (Doubly_Circular)
+				{
+					n->next = head;
+					tail->next = n;
+					n->prev = tail;
+					tail = n;
+					head->prev= tail;
+				}
+				else //Singly_Circular
+				{
+					n->next = head;
+					tail->next = n;
+					tail = n;
+				}
 			}
-
 		}
 		SizeCount++;
 	}
 
-	//adds node at end of list
-	//Node(previus, next, value)
-	//template <typename T>
-	void append(Node * n)  //void append(T value) He wants me to pass a pointer to a Node
+	Node* create_node(int value)
 	{
-		if (isEmpty())
-		{
-			head->next = n;
-			n->previous = head;
-			tail->previous = n;
-			n->next = tail;
-		//	head = new Node(NULL, NULL, value);
-		//	tail = head;
-		}
-		else {
-			if (ListType != Circular || ListType != Doubly_Circular)
-			{
-				//temp->previous = tail->previous;
-				tail->next = new Node(tail, NULL, value);
-				tail = tail->next;
-			}
-			else
-			{
-				tail->next = new Node(tail, head, value);
-				tail = tail->next;
-			}
-		}
-		SizeCount++;
+		Node* n = new Node(value);
+		return n;
+	}
+	
+	void remove_tail()
+	{
+
 	}
 
 	void push(Node* n)
@@ -126,7 +131,7 @@ public:
 
 	}
 
-	void deleteX() 
+	void deleteX()
 	{
 
 	}
@@ -151,19 +156,20 @@ public:
 
 	}
 
-	void setListType(int ListType)
+	void setListType()
 	{
-		this -> ListType = ListType;
+		DesplayType();
+		int ListType = -1;
+		cin >> ListType;
+		this->ListType = ListType;
 	}
-
-
-	//template <typename T>
 	bool perform_operation(int op_code, int value)
 	{
 		switch (op_code)
 		{
 		case 1:
-			cout << "Choice 1" << endl;
+			cout << "appending node" << endl;
+			append(create_node(value));
 			break;
 		case 2:
 			cout << "Choice 2" << endl;
@@ -201,38 +207,57 @@ public:
 		case 13:
 			cout << "Choice 13" << endl;
 			break;
-
+		case 14:
+			cout << "Reopening menu" << endl;
+			DesplayMenu();
+			break;
+		case 0:
+			cout << "Exiting" << endl;
+			return 0;
+			break;
 		}
 	}
+
 private:
 	Node * head;
 	Node * tail;
 	int SizeCount;
 	int ListType;
-
 };
 
-//main function
 int main()
 {
-	DesplayType();
-	int ListType = -1;
-	while (ListType < 1 && ListType > 4)
-	{
-		cin >> ListType;
-	}
-	
+	int value = -1;
+	int op_code = -1;
 	LinkedList List1;
-	List1.setListType(ListType);
-
-	Node myNode(NULL, NULL, 5);
-
-	List1.append(myNode);
-
+	List1.setListType();
 	DesplayMenu();
+	do
+	{
+		do
+		{
+			cout << "enter op_code" << endl;
+			cin >> op_code;
+		} while (op_code >= 0 || op_code <= 14);
+		if (op_code == 0)
+		{
+			value = NULL;
+			List1.perform_operation(op_code, value);
+		}
+		cout << "enter value" << endl;
+		cin >> value;
+		List1.perform_operation(op_code, value);
+
+	} while (op_code != 0);
+
 	system("pause");
+	return 0;
 }
 
+void create_List()
+{
+	
+}
 //User Display Map
 void DesplayType()
 {
@@ -259,5 +284,8 @@ void DesplayMenu()
 	cout << "|___Rotate_______________#11_________|" << endl;
 	cout << "|___Random_Shuffle_______#12_________|" << endl;
 	cout << "|___Size_________________#13_________|" << endl;
+	cout << "|___Show_Menu____________#14_________|" << endl;
+	cout << "|___Quit_________________#0__________|" << endl;
 	cout << "+------------------------------------+" << endl;
 }
+
