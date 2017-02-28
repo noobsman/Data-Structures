@@ -1,0 +1,758 @@
+#include <iostream>
+#include <cstdlib>
+#include <iostream>
+#include <ctime>
+using namespace std;
+void DesplayMenu();
+void DesplayType();
+
+enum listType { Singly = 1, Doubly = 2, Singly_Circ = 3, Doubly_Circ = 4 };
+template <typename alltype>
+class Node
+{
+public:
+	Node(alltype value) : value(value)
+	{
+		next = nullptr;
+		prev = nullptr;
+		this->value = value;
+	}
+	Node<alltype>* get_prev()
+	{
+		return prev;
+	}
+	Node<alltype>* get_next()
+	{
+		return next;
+	}
+	void set_next(Node<alltype> * n)
+	{
+		next = n;
+	}
+	void set_prev(Node<alltype> * n)
+	{
+		prev = n;
+	}
+	alltype get_value()
+	{
+		return value;
+	}
+private:
+	Node<alltype> * prev;
+	Node<alltype> * next;
+	alltype value;
+};
+
+template <class alltype>
+class LinkedList
+{
+public:
+	LinkedList()
+	{
+		head = nullptr;
+		tail = nullptr;
+		SizeCount = 0;
+		ListType = -1;
+	}
+	//checks if list is empty
+		bool isEmpty()
+	{
+		return head == nullptr;
+	}
+	void append(Node<alltype> * n) //Adds node to end of the list
+	{
+		if (isEmpty())
+		{
+			head = n;
+			tail = n;
+		}
+			if (!is_circular())
+			{
+				if (ListType == Doubly)
+				{
+					n->set_next(nullptr);
+					tail->set_prev(n);
+					n->set_prev(tail);
+					tail = n;
+				}
+				else //Singly
+				{
+					n->set_next(nullptr);
+					tail->set_next(n);
+					tail = n;
+				}
+			}
+			else
+			{
+				if (ListType == Doubly_Circ)
+				{
+					n->set_next(head);
+					tail->set_next(n);
+					n->set_prev(tail);
+					tail = n;
+					head->set_prev(tail);
+				}
+				else //Singly_Circ
+				{
+					n->set_next(head);
+					tail->set_next(n);
+					tail = n;
+				}
+			}
+		SizeCount++;
+	}
+	Node<alltype>* create_node(alltype value) // creates new node
+	{
+		Node<alltype>* n = new Node<alltype>(value);
+		return n;
+	}
+	void remove_tail() // removes the tail of the list
+	{
+		if (isEmpty())
+		{
+		return;
+		}
+			if (tail == head)
+			{
+				delete head;
+				head, tail = nullptr;
+			}
+			else
+			{
+				if (!is_circular())
+				{
+					if (ListType == Doubly)
+					{
+						tail = tail->get_prev();
+						delete tail->get_next();
+						SizeCount--;
+						tail->set_next(nullptr);
+					}
+					else // Singly
+					{
+						Node<alltype>* temp = head;
+						while (temp->get_next() != tail)
+						{
+							temp = temp->get_next();
+						}
+						delete tail;
+						SizeCount--;
+						tail = temp;
+						tail->set_next(nullptr);
+					}
+				}
+				else
+				{
+					if (ListType == Doubly_Circ)
+					{
+						tail = tail->get_prev();
+						delete tail->get_next();
+						SizeCount--;
+						tail->set_next(head);
+						head->set_prev(tail);
+					}
+					else // Singly_Circ
+					{
+						Node<alltype>* temp = head;
+						while (temp->get_next() != tail)
+						{
+							temp = temp->get_next();
+						}
+						delete tail;
+						SizeCount--;
+						tail = temp;
+						tail->set_next(head);
+					}
+				}
+			}
+	}
+	void push(Node<alltype>* n)  // adds node to head of the list
+	{
+		if (isEmpty())
+		{
+			head = n;
+			tail = n;
+		}
+		else
+		{
+			if (!is_circular())
+			{
+				if (ListType == Doubly)
+				{
+					n->set_next(head);
+					head->set_prev(n);
+					head = n;
+
+				}
+				else //Singly
+				{
+					n->set_next(head);
+					head = n;
+				}
+			}
+			else
+			{
+				if (ListType == Doubly_Circ)
+				{
+					n->set_next(head);
+					head->set_prev(n);
+					n->set_prev(tail);
+					tail->set_next(n);
+					head = n;
+				}
+				else //Singly_Circ
+				{
+					n->set_next(head);
+					tail->set_next(n);
+					head = n;
+				}
+			}
+		}
+	SizeCount++;
+	}
+
+	Node<alltype>* pop() // pops node of the head of the list
+	{
+		if (isEmpty())
+		{
+			return;
+		}
+			Node<alltype>* n = head;
+			if (!is_circular())
+			{
+				if (ListType == Doubly)
+				{
+					n = head;
+					head = head->get_next();
+					head->set_prev(nullptr);
+					n->set_next(nullptr);
+					return n;
+				}
+				else //Singly
+				{
+					n = head;
+					head = head->get_next();
+					n->set_next(nullptr);
+					return n;
+				}
+			}
+			else
+			{
+				if (ListType == Doubly_Circ)
+				{
+					Node<alltype> * temp = head->get_prev();
+					n = head;
+					head = head->get_next();
+					temp->set_next(head);
+					head->set_prev(temp);
+					n->set_next(nullptr);
+					n->set_prev(nullptr);
+					return n;
+
+				}
+				else //Singly_Circ
+				{
+					Node<alltype> * temp = head;
+					while (temp->get_next() != head)
+					{
+						temp = temp->get_next();
+					}
+					n = head;
+					head = head->get_next();
+					temp->set_next(head);
+					n->set_next(nullptr);
+					return n;
+
+				}
+			}
+			SizeCount--;	
+
+	}
+	void remove_head()  // removes node at head of the list
+	{
+		if (isEmpty())
+		{
+			return;
+		}
+		if (!is_circular())
+		{
+			if (ListType == Doubly)
+			{
+				Node<alltype> * temp = head;
+				head = head->get_next();
+				head->set_prev(nullptr);
+				delete temp;
+			}
+			else //Singly
+			{
+				Node<alltype> * temp = head;
+				head = head->get_next();
+				delete temp;
+			}
+		}
+		else
+		{
+			if (ListType == Doubly_Circ)
+			{
+				Node<alltype> * head_temp = head;
+				Node<alltype> * temp = head->get_prev();
+				head_temp = head;
+				head = head->get_next();
+				temp->set_next(head);
+				head->set_prev(temp);
+				head_temp->set_next(nullptr);
+				head_temp->set_prev(nullptr);
+				delete head_temp;
+			}
+			else //Singly_Circ
+			{
+				Node<alltype> * temp = head;
+				Node<alltype> * temp_prev = head;
+				while (temp->get_next() != head)
+				{
+					temp = temp->get_next();
+				}
+				temp_prev = head;
+				head = head->get_next();
+				temp->set_next(head);
+				temp_prev->set_next(nullptr);
+				delete temp_prev;
+			}
+		}
+		SizeCount--;
+	}
+
+	void remove_i(int i)  // removes node at i position
+		{
+			Node<alltype>* temp = get_i(i);
+			Node<alltype>* temp_prev = head;
+			if (temp == head)
+			{
+				remove_head();
+			}
+			if (temp == tail)
+			{
+				remove_tail();
+			}
+			if (isEmpty())
+			{
+				return;
+			}
+			if (is_doubly())
+			{
+	
+				temp_prev = temp->get_prev();
+				temp_prev->set_next(temp->get_next());
+				temp->get_next()->set_prev(temp_prev);
+				delete temp;
+				SizeCount--;
+	
+			else //Singly
+			{
+				while (temp_prev->get_next() != temp)
+				{
+					temp_prev = temp_prev->get_next();
+				}
+				temp_prev->set_next(temp->get_next());
+				temp->set_next(nullptr);
+				delete temp;
+				SizeCount--;
+			}
+		}
+	}	
+
+	Node<alltype>* get_i(int i)	// returns pointer to a node at i position
+	{
+		if (isEmpty())
+		{
+			return;
+		}
+		Node<alltype>* temp = head;
+		for (int c = 1; c < i; c++)
+		{
+			temp = temp->get_next();
+		}
+		return temp;
+	}
+
+	void add_i(Node<alltype>* n, int i) // adds node at i postion
+	{
+		Node<alltype>* temp = get_i(i);
+		Node<alltype>* temp_prev = head;
+		if (isEmpty())
+		{
+			head = n;
+			tail = n;
+		}
+		if (temp == head)
+		{
+			push(n);
+		}
+		if (temp == tail)
+		{
+			append(n);
+		}
+		else
+		{
+			if (is_doubly())
+			{
+				n = temp;
+				temp->get_prev()->set_next(n);
+				temp->set_prev(n);
+				SizeCount++;
+			}
+			else //Singly
+			{
+				while (temp_prev->get_next() != temp)
+				{
+					temp_prev = temp_prev->get_next();
+				}
+				n = temp;
+				temp_prev = n;
+				SizeCount++;
+			}
+		}
+	}
+	void print() // prints list
+	{
+		if (isEmpty())
+		{
+			cout << "Empty list" << endl;
+		}
+		else
+		{
+			if (!is_circular())
+			{
+				Node<alltype> * temp = head;
+				while (temp != nullptr)
+				{
+					cout << temp->get_value() << endl;
+					temp = temp->get_next();
+				}
+			}
+			else // circular
+			{
+				Node<alltype> * temp = head;
+				do
+				{
+					cout << temp->get_value() << endl;
+					temp = temp->get_next();
+				} while (temp != head);
+			}
+		}
+	}
+	void deleteX()  // deletes list
+	{
+		if (isEmpty())
+		{
+			return;
+		}
+		Node<alltype>* temp = head;
+		while (head != tail)
+		{
+			temp = head->get_next();
+			delete head;
+			head = temp;
+		}
+		delete head;
+		head = nullptr;
+		tail = head;
+		SizeCount = 0;
+	}
+	void reverse() // reverses the whole list i.e 1->2->3->4, 4->3->2->1
+	{
+		Node<alltype>* temp = head;
+		if (isEmpty())
+		{
+			return;
+		}
+		if (head == tail)
+		{
+			return;
+		}
+		else 
+		{
+			while (head->get_next() != tail)
+			{
+				rotate(1);
+				head = head->get_next();
+			}
+			head = temp;
+		}
+
+	}
+	void rotate(int rotations) // rotates 1 node for each rotations value to the start of the list
+	{
+		Node<alltype>* temp = head;
+		if (isEmpty())
+		{
+			return;
+		}
+		if (head == tail)
+		{
+			return;
+		}
+		if (!is_circular())
+		{
+			if (ListType == Doubly)
+			{
+				for (int i = 0; i < rotations; i++)
+				{
+					temp = tail->get_prev();
+					temp->set_next(nullptr);
+					tail->set_prev(nullptr);
+					head->set_prev(tail);
+					tail->set_next(head);
+					head = tail;
+					tail = temp;
+				}
+
+			}
+			else //Singly
+			{
+				for (int i = 0; i < rotations; i++)
+				{
+					while (temp->get_next() != tail)
+					{
+						temp = temp->get_next();
+					}
+					temp->set_next(nullptr);
+					tail->set_next(head);
+					head = tail;
+					tail = temp;
+				}
+			}
+		}
+		else
+		{
+			if (ListType == Doubly_Circ)
+			{
+				for (int i = 0; i < rotations; i++)
+				{
+					temp = tail->get_prev();
+					head = tail;
+					tail = temp;
+				}
+			}
+			else //Singly_Circ
+			{
+				for (int i = 0; i < rotations; i++)
+				{
+					while (temp->get_next() != tail)
+					{
+						temp = temp->get_next();
+					}
+					head = tail;
+					tail = temp;
+				}
+			}
+		}
+	}
+	void random_shuffle() // not done
+	{
+		if (isEmpty())
+		{
+			return;
+		}
+		else
+		{
+			Node<alltype> * temp = head;
+			Node<alltype> * rand_temp = head;
+			int rand_count = rand() % size();
+			//cout << RAND_MAX << endl; // max rand number used for debugging
+			while (temp != tail->get_next())
+			{
+				int i = 1;
+				rand_temp = get(rand_count);
+				remove_i(rand_count)
+				add_i(rand_temp, 1)
+				temp = temp->get_next();
+				i++;
+			}
+		}
+	}
+	int size()  // returns size of the list
+	{
+		return SizeCount;
+	}
+
+	void setListType() // sets type of list to 1=singly 2=doubly 3=singly_cric 4=doubly_circ
+	{
+		DesplayType();
+		int ListType = -1;
+		while (ListType < 0 || ListType > 4)
+		{
+			cin >> ListType;
+			if (ListType < 0 || ListType > 4)
+			{
+				cout << "Error invalid ListType" << endl;
+				DesplayType();
+			}
+		}
+			this->ListType = ListType;
+	}
+	bool perform_operation(int op_code, alltype value) // main user interface option chooser.
+	{
+		switch (op_code)
+		{
+		case 1:
+			cout << "appending node" << endl;
+			append(create_node(value));
+			break;
+		case 2:
+			cout << "removing tail" << endl;
+			remove_tail();
+			break;
+		case 3:
+			cout << "Pushing on node" << endl;
+			push(create_node(value));
+			break;
+		case 4:
+			cout << "poping off node" << endl;
+			pop();
+			cout << "node value = " << pop() << endl;
+			cout << "do you wish to delete node? 1 yes 2 no?" << endl;
+			int choice = -1;
+			while (choice > 2 || choice < 1)
+			{
+				cin >> choice;
+				if (choice > 2 || choice < 1)
+				{
+					cout << "error not '1' yes or '2' no!" << endl;
+				}
+			}
+			if (choice = 1)
+			{
+				delete pop();
+			}
+			else
+			{
+			}
+			break;
+		case 5:
+			cout << "removing_i" << endl;
+			remove_i(value);
+			break;
+		case 6:
+			cout << "Getting_i" << endl;
+			break;
+		case 7:
+			cout << "enter node value :";
+			alltype node_value
+			cin >> node_value;
+			add_i(create_node(node_value), value);
+			cout << "Adding node at : "<< value << endl;
+			break;
+		case 8:
+			cout << "Printing" << endl;
+			print();
+			break;
+		case 9:
+			cout << "Deleting List" << endl;
+			deleteX();
+			break;
+		case 10:
+			cout << "Rotating" << endl;
+			rotate(value);
+			break;
+		case 11:
+			cout << "Reversing" << endl;
+			reverse();
+			break;
+		case 12:
+			cout << "Randomizing" << endl;
+			random_shuffle();
+			break;
+		case 13:
+			cout << "Size_Count is : "<< size() << endl;
+			break;
+		case 14:
+			cout << "Reopening menu" << endl;
+			DesplayMenu();
+			break;
+		case 0:
+			cout << "Exiting" << endl;
+			return 0;
+			break;
+		}
+	}
+private:  // private values
+	Node<alltype> * head;
+	Node<alltype> * tail;
+	int SizeCount;
+	int ListType;
+
+	bool is_circular() { //returns Circular
+		return ListType == Doubly_Circ || ListType == Singly_Circ;
+	}
+
+	bool is_singly() { // returns Singly
+		return ListType == Singly || ListType == Singly_Circ;
+	}
+
+	bool is_doubly() { //returns Doubly
+		return ListType == Doubly_Circ || ListType == Doubly;
+	}
+
+};
+
+int main() //main function
+{
+	srand(time(0));
+	int value = -1;
+	int op_code = -1;
+	LinkedList List1;
+	List1.setListType();
+	DesplayMenu();
+	do
+	{
+		op_code = -1;
+		while(op_code < 0 || op_code > 14)
+		{
+			cout << "enter op_code" << endl;
+			cin >> op_code;
+		}
+		if (op_code == 0)
+		{
+			value = NULL;
+			List1.perform_operation(op_code, value);
+		}
+		cout << "enter value" << endl;
+		cin >> value;
+		List1.perform_operation(op_code, value);
+	} while (op_code != 0);
+
+	system("pause");
+	return 0;
+}
+
+//User Display Map key.
+void DesplayType()
+{
+	cout << "____List_Type?___________OP choice____" << endl;
+	cout << "|___Singly_______________#1__________|" << endl;
+	cout << "|___Doubly_______________#2__________|" << endl;
+	cout << "|___Singly-Circulary_____#3__________|" << endl;
+	cout << "|___Doubly-Circulary_____#4__________|" << endl;
+	cout << "+------------------------------------+" << endl;
+}
+void DesplayMenu()
+{
+	cout << "____Menu_________________OP choice____" << endl;
+	cout << "|___Append_______________#1__________|" << endl;
+	cout << "|___Remove_Tail__________#2__________|" << endl;
+	cout << "|___Push_________________#3__________|" << endl;
+	cout << "|___Pop__________________#4__________|" << endl;
+	cout << "|___Remove_i_____________#5__________|" << endl;
+	cout << "|___Get_i________________#6__________|" << endl;
+	cout << "|___Add_i________________#7__________|" << endl;
+	cout << "|___Print________________#8__________|" << endl;
+	cout << "|___Delete_______________#9__________|" << endl;
+	cout << "|___Reverse______________#10_________|" << endl;
+	cout << "|___Rotate_______________#11_________|" << endl;
+	cout << "|___Random_Shuffle_______#12_________|" << endl;
+	cout << "|___Size_________________#13_________|" << endl;
+	cout << "|___Show_Menu____________#14_________|" << endl;
+	cout << "|___Quit_________________#0__________|" << endl;
+	cout << "+------------------------------------+" << endl;
+}
