@@ -71,13 +71,13 @@ public:
 				if (ListType == Doubly)
 				{
 					n->set_next(nullptr);
-					tail->set_prev(n);
+					tail->set_next(n);
 					n->set_prev(tail);
 					tail = n;
 				}
 				else //Singly
 				{
-					n->set_next(nullptr);
+					n->set_next(nullptr); //n->set_next(tail->get_next(); to make circ singly and singly same and genaric
 					tail->set_next(n);
 					tail = n;
 				}
