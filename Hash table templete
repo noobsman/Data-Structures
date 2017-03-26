@@ -1,0 +1,138 @@
+#include <iostream>
+#include <cstddef>
+#include <string>
+#include <cmath>
+#include <ctime>
+#include <cstdlib>
+
+using namespace std;
+
+template <typename KEY, typename VALUE>
+class Entry
+{
+	template<typename K, typename V> friend class HashTable;
+
+	private:
+		KEY key;
+		VALUE value;
+		Entry * next_entry;
+
+	public:
+		/*** Constructors ***/
+		Entry(void) : key(KEY()), value(VALUE()), next_entry(NULL) {}
+		//If you would like you can convert constructors to have this look
+		Entry(KEY key, VALUE value)
+		{
+			this->template key = key;
+			this->template value = value;
+			this->template next_entry = NULL;
+		}
+
+		Entry(KEY key, VALUE value, Entry * next) : key(key), value(value), next_entry(next) {}
+
+		//accessors
+		KEY get_key() { return key; }
+		VALUE get_value() { return value; }
+		Entry * get_next_entry() { return next_entry; }
+
+		//mutators
+		void set_key(KEY key) { this.key = key; }
+		void set_value(VALUE value) { this.value = value; }
+		void set_next_entry(Entry * entry) { this.next_entry = entry; }
+
+};
+template<typename K, typename V>
+class HashTable
+{
+	private:
+		int N;
+		Entry<K,V> **hash_table; //Make sure you understand this line
+
+	public:
+		HashTable()
+		{
+			this->N = 10000;
+			hash_table = new Entry<K, V> * [this->N];
+
+            		for (int i = 0; i < this->N; i++)
+				hash_table[i] = NULL;
+		}
+		HashTable(int N)
+		{
+			this->N = N;
+           	 	hash_table = new Entry<K, V> * [this->N];
+
+            		for (int i = 0; i < this->N; i++)
+				hash_table[i] = NULL;
+		}
+
+		/* hashcose string to int */
+		int hashcode(string s);
+
+		/* hashcode int to int */
+		int hashcode(int i);
+
+		/* hascode char to int */
+		int hashcode(char c);
+
+		/* hascode long to int */
+		int hashcode(unsigned long ul);
+
+		/* basic compression function */
+		int compression(int hc);
+
+		/* insert e into hash table */
+		void insert(Entry<K, V> * e);
+
+		/* replace e1 with e2 */
+		void replace(Entry<K, V> * e1, Entry<K, V> * e2);
+
+		/* find e and return */
+		Entry<K, V> * find(Entry<K, V> * e);
+
+		/* remove e from the table */
+ 		void remove(Entry<K, V> * e);
+
+		/* if grow = 1 increase the table
+ 		 * otherwise decrease the table
+ 		 */
+		void resize(bool grow);
+
+		double compute_load_factor();
+
+		int longest_chain_length();
+};
+
+/* I recommend you make a temp main for testing all of your boundary
+ * cases.  I reserve the right to change the main function.  I promise
+ * it will only call the function prototypes provided; which means, you
+ * cannot change the prototypes.
+ */
+int main()
+{
+	//seed the random number generator
+	srand(42);
+
+	HashTable<unsigned long, string>  table_01(10000);
+	unsigned long key;
+	string value;
+	Entry<unsigned long, string> * e;
+
+	// Fill the table with random entries
+	for (int i = 0; i < 100000; i++)
+	{
+		/* create a random entry */
+		key = (sizeof(int) < sizeof(long)) ? (static_cast<int>(((unsigned long)rand()) << (sizeof(int) * 8)) | rand()) : rand();
+		value = "";
+		for (int j = 0; j < (rand()%45+1); j++)
+			value += 'a' + rand()%26;
+		e = new Entry<unsigned long, string>(key, value);
+
+		table_01.insert(e);
+	}
+
+	cout << "Longest Chain: " << table_01.longest_chain_length() << endl;
+	cout << "Load Factor: " << table_01.compute_load_factor() << endl;
+
+	return 0;
+}
